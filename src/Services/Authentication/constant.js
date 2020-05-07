@@ -1,0 +1,9 @@
+export const TOGGLE_FLAG = 'TOGGLE_FLAG';
+export const LOGIN_START = 'LOGIN_START';
+export const LOGIN_FAILED = 'LOGIN_FAILED';
+export const LOGIN_SUCCESS = 'LOGIN_SUCCESS';
+export const STORE_ACCESS = 'STORE_ACCESS';
+export const STORE_SEARCH = 'STORE_SEARCH';
+export const STORE_CONCEPT = 'STORE_CONCEPT';
+export const TOGGLE_SUCCESS = 'TOGGLE_SUCCESS';
+export const TOGGLE_SPLASH = 'TOGGLE_SPLASH';

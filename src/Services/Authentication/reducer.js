@@ -1,44 +1,25 @@
 import {
-  TOGGLE_FLAG,
-  LOGIN_START,
-  LOGIN_FAILED,
-  LOGIN_SUCCESS,
-  STORE_ACCESS,
+  TOGGLE_UPDATE,
+  TOGGLE_DELETE,
   STORE_SEARCH,
   STORE_CONCEPT,
-  TOGGLE_SUCCESS,
-  TOGGLE_SPLASH,
+  TOGGLE_CREATE,
+  DELETE_UNABLE,
+  CREATE_UNABLE,
+  UPDATE_UNABLE,
+  RESET_ALL,
+  API_FAILURE,
 } from './constant';
 const initialState = {
-  isLoading: 0,
-  isSuccess: 0,
-  token: '',
-  storeAcess: '',
-  searchData: '',
-  isSearching: false,
-  isStore: false,
+  isCreated: 0,
   isConceptLoading: true,
   conceptData: '',
+  isUpdated: 0,
+  isDeleted: 0,
+  isFailed: 0,
 };
 const homeReducer = (state = initialState, action) => {
   switch (action.type) {
-    case LOGIN_START:
-      return {...state, isLoading: 1};
-    case LOGIN_FAILED:
-      return {...state, isSuccess: 2, isLoading: 0};
-    case LOGIN_SUCCESS:
-      return {
-        ...state,
-        isSuccess: 1,
-        isLoading: 0,
-        token: action.data.header,
-      };
-    case STORE_ACCESS:
-      return {
-        ...state,
-        isStore: true,
-        storeAcess: action.data,
-      };
     case STORE_SEARCH:
       return {
         ...state,
@@ -51,16 +32,45 @@ const homeReducer = (state = initialState, action) => {
         conceptData: action.data,
         isConceptLoading: false,
       };
-    case TOGGLE_SUCCESS:
+    case TOGGLE_CREATE:
       return {
         ...state,
-        isSuccess: 0,
-        isLoading: 0,
+        isCreated: true,
       };
-    case TOGGLE_SPLASH:
+    case TOGGLE_UPDATE:
       return {
         ...state,
-        token: action.data,
+      };
+    case TOGGLE_DELETE:
+      return {
+        ...state,
+      };
+    case CREATE_UNABLE:
+      return {
+        ...state,
+        isCreated: 1,
+      };
+    case UPDATE_UNABLE:
+      return {
+        ...state,
+        isUpdated: 1,
+      };
+    case DELETE_UNABLE:
+      return {
+        ...state,
+        isDeleted: 1,
+      };
+    case RESET_ALL:
+      return {
+        ...state,
+        isCreated: 0,
+        isUpdated: 0,
+        isDeleted: 0,
+      };
+    case API_FAILURE:
+      return {
+        ...state,
+        isFailed: 1,
       };
     default:
       return state;

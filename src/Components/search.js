@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import {connect} from 'react-redux';
-import {toggleFlag, toggleSearch} from '../Services/Authentication/action';
+import {toggleSearch} from '../Services/Authentication/action';
 import {FlatList} from 'react-native-gesture-handler';
 import config from '../config/env';
 
@@ -26,6 +26,7 @@ class Search extends React.Component {
   }
   onChangeText(input) {}
   render() {
+    const array = [this.props.searchData.data];
     const {navigation} = this.props;
     return (
       <View style={styles.container}>
@@ -50,23 +51,20 @@ class Search extends React.Component {
                 showsHorizontalScrollIndicator={false}
                 showsVerticalScrollIndicator={false}
                 scrollEnabled={true}
-                data={this.state.localSearchData}
+                data={array}
                 renderItem={({item}) => {
                   return (
-                    <TouchableOpacity
-                      activeOpacity={0.5}
-                      onPress={() =>
-                        navigation.navigate('ItemDetails', {data: item})
-                      }>
+                    <TouchableOpacity activeOpacity={0.5}>
                       <View style={styles.FlatItemsVIew}>
+                        <Text style={styles.FlatTextView}>{item.id}</Text>
                         <Text style={styles.FlatTextView}>
-                          {item.productName}
+                          {item.employee_name}
                         </Text>
                       </View>
                     </TouchableOpacity>
                   );
                 }}
-                keyExtractor={item => item.productId}
+                keyExtractor={item => item.id}
               />
             </View>
           ) : null}
@@ -76,19 +74,11 @@ class Search extends React.Component {
   }
   componentDidMount() {}
   static getDerivedStateFromProps(props, state) {
-    let apiConfig = config.apiURl;
-    let searchURL = config.apiConfig.tempStoreApi.searchListHandle;
+    let apiConfig = 'http://dummy.restapiexample.com/api/v1/employee/';
     var lengthOfInput = state.searchURL.length;
-    if (lengthOfInput >= 3) {
-      var urlApi = apiConfig + searchURL;
-      var newApi = urlApi.concat(state.searchURL);
-      props.toggleSearch(props.token, newApi);
-      state.localSearchData = props.searchData;
-    }
-    if (lengthOfInput < 3) {
-      var urlApi = apiConfig + searchURL;
-      props.toggleSearch(props.token, urlApi);
-      state.localSearchData = props.searchData;
+    if (lengthOfInput > 0) {
+      var newApi = apiConfig.concat(state.searchURL);
+      props.toggleSearch(newApi);
     }
     return null;
   }
@@ -146,15 +136,11 @@ const styles = StyleSheet.create({
 });
 
 const mapStateToProps = state => ({
-  token: state.homeReducer.token,
-  isStore: state.homeReducer.isStore,
-  storeData: state.homeReducer.storeAcess,
   searchData: state.homeReducer.searchData,
   isSearching: state.homeReducer.isSearching,
 });
 
 const mapDispatchToProps = {
-  toggleHomeFlag: toggleFlag,
   toggleSearch: toggleSearch,
 };
 export default connect(

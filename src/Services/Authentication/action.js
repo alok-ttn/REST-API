@@ -1,117 +1,137 @@
+/* eslint-disable space-infix-ops */
+/* eslint-disable prettier/prettier */
 import {
-  LOGIN_START,
-  LOGIN_FAILED,
-  LOGIN_SUCCESS,
-  STORE_ACCESS,
-  STORE_SEARCH,
+  TOGGLE_UPDATE,
+  TOGGLE_DELETE,
   STORE_CONCEPT,
-  TOGGLE_SUCCESS,
-  TOGGLE_SPLASH,
+  TOGGLE_CREATE,
+  DELETE_UNABLE,
+  CREATE_UNABLE,
+  UPDATE_UNABLE,
+  API_FAILURE,
+  RESET_ALL,
 } from './constant';
-import AsyncStorage from '@react-native-community/async-storage';
 import config from '../../config/env';
-export const toggleSuccess = () => dispatch => {
-  dispatch({
-    type: TOGGLE_SUCCESS,
-  });
-};
-export const toggleFlag = (username, password) => dispatch => {
-  let apiConfig = config.apiURl;
-  let pageURL = config.apiConfig.authenticationApi.loginUserHandle;
-  dispatch({
-    type: LOGIN_START,
-  });
-  fetch(apiConfig + pageURL, {
+import CommonFetch from './commonFetch';
+export const toggleCreate = (username, email, name, phone) => dispatch => {
+  fetch(config.apiURl, {
     method: 'POST',
+    headers: {Accept: 'application/json', 'content-type': 'application/json'},
     body: JSON.stringify({
       username: username,
-      password: password,
+      email: email,
+      name: name,
+      phone_number: Number(phone),
     }),
-  }).then(response => {
-    if (!(response.status === 200)) {
-      //   Alert.alert('wrong credentials');
-      dispatch({
-        type: LOGIN_FAILED,
-        data: {flag: false},
-      });
-    } else {
-      var temp = response.headers.map.authorization.split(' ');
-      dispatch({
-        type: LOGIN_SUCCESS,
-        data: {header: temp[1], flag: false},
-      });
-    }
-  });
-};
-export const toggleSplash = () => async dispatch => {
-  try {
-    const value = await AsyncStorage.getItem('headerToken');
-    if (value !== null) {
-      dispatch({
-        type: TOGGLE_SPLASH,
-        data: value,
-      });
-    }
-    if (value === null) {
-      dispatch({
-        type: TOGGLE_SPLASH,
-        data: '',
-      });
-    }
-  } catch (error) {
-    console.log('error in getting token', error);
-  }
-};
-export const toggleStore = header => dispatch => {
-  let apiConfig = config.apiURl;
-  let storeURL = config.apiConfig.tempStoreApi.storeListHandle;
-  fetch(apiConfig + storeURL, {
-    method: 'GET',
-    headers: {
-      Authorization: header,
-    },
   })
     .then(response => response.json())
     .then(responseJson => {
-      dispatch({
-        type: STORE_ACCESS,
-        data: responseJson,
-        // navigation.navigate('StoreList', {storeData: this.state.storeData});
-      });
+      dispatch(toggleConcept);
+      if (responseJson.status === true) {
+        dispatch({
+          type: TOGGLE_CREATE,
+        });
+      } else {
+        dispatch({
+          type: CREATE_UNABLE,
+        });
+      }
     });
 };
 
-export const toggleSearch = (header, newApi) => dispatch => {
-  fetch(newApi, {
-    method: 'GET',
-    headers: {
-      Authorization: header,
-    },
+export const toggleUpdate = (username, email, name, phone, id) => dispatch => {
+  fetch(config.apiURl + config.updateEmployee + id, {
+    method: 'PUT',
+    headers: {Accept: 'application/json', 'content-type': 'application/json'},
+    body: JSON.stringify({
+      username: username,
+      email: email,
+      name: name,
+      phone_number: Number(phone),
+    }),
   })
     .then(response => response.json())
     .then(responseJson => {
-      dispatch({
-        type: STORE_SEARCH,
-        data: responseJson,
-        // navigation.navigate('StoreList', {storeData: this.state.storeData});
-      });
+      dispatch(toggleConcept);
+      if (responseJson.status === true) {
+        dispatch({
+          type: TOGGLE_UPDATE,
+        });
+      } else {
+        dispatch({
+          type: UPDATE_UNABLE,
+        });
+      }
     });
 };
-export const toggleConcept = header => dispatch => {
-  let apiConfig = config.conceptURL;
-  let conceptsURL = config.apiConfig.tempStoreApi.conceptListHandle;
-  fetch(apiConfig + conceptsURL, {
-    method: 'GET',
-    headers: {
-      Authorization: header,
-    },
+
+export const toggleDelete = id => dispatch => {
+  // console.warn(config.apiURl + config.updateEmployee + id);
+  fetch(config.apiURl + config.updateEmployee + id, {
+    method: 'DELETE',
+    headers: {Accept: 'application/json', 'content-type': 'application/json'},
   })
     .then(response => response.json())
     .then(responseJson => {
-      dispatch({
-        type: STORE_CONCEPT,
-        data: responseJson,
-        // navigation.navigate('StoreList', {storeData: this.state.storeData});
-      });
+      dispatch(toggleConcept);
+      if (responseJson.status === true) {
+        dispatch({
+          type: TOGGLE_DELETE,
+        });
+      } else {
+        dispatch({
+          type: DELETE_UNABLE,
+        });
+      }
     });
 };
+
+export const toggleConcept = () => dispatch => {
+  // console.warn('called');
+  fetch(config.apiURl, {
+    method: 'GET',
+    headers: {Accept: 'application/json', 'content-type': 'application/json'},
+  })
+    .then(response => response.json())
+    .then(responseJson => {
+      if (responseJson.status === true) {
+        dispatch({
+          type: STORE_CONCEPT,
+          data: responseJson.data,
+        });
+      } else {
+        dispatch({
+          type: API_FAILURE,
+        });
+      }
+    });
+};
+
+export const resetAll = () => dispatch => {
+  dispatch({
+    type: RESET_ALL,
+  });
+};
+// export const demofetch = () => dispatch => {
+//   const result = CommonFetch(
+//     'http://dummy.restapiexample.com/api/v1/employees',
+//     'GET',
+//     null,
+//   );
+//   console.log(result);
+// };
+
+// export const toggleSearch = newApi => dispatch => {
+//   fetch(newApi, {
+//     method: 'GET',
+//   })
+//     .then(response => response.json())
+//     .then(responseJson => {
+//       dispatch(toggleConcept());
+//       dispatch({
+//         type: STORE_SEARCH,
+//         data: responseJson,
+//         // navigation.navigate('StoreList', {storeData: this.state.storeData});
+//       });
+//     });
+// };
